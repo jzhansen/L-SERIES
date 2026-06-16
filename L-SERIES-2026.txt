@@ -1,0 +1,612 @@
+(*  JORGE ZUNIGA. FAST COMPUTING OF SOME DIRICHLET L-SERIES (2026) 
+    MAPLE FILE "L-SERIES-2026.TXT" OR "L-SERIES-2026.MW" 
+    DIRECTIONS TO BUILD, LOAD & EXECUTE FOR IDENTITIES PROOFS:
+ 1.-DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
+    https://github.com/HBrochet/CreativeTelescoping/blob/main/CreativeTelescoping.mla
+ 2.-DOWNLOAD MAPLE FILE "Mgfun4.1.mla" from this link
+    https://specfun.inria.fr/chyzak/Mgfun4.1.mla
+ 3.-Add both .mla files to the directory maple20XX/lib/
+ 4.-CUT LAST COMMENT SECTION (FROM ArXiv TeX FILE) AND PASTE IT INTO ANY OF THESE
+    TWO OPTIONS:
+ 5.-OPTION 1: 
+    A TEXT FILE "L-SERIES-2026.TXT" AND SAVE IT IN WORKING DIRECTORY, SAY \MyFile 
+ 6.-EXECUTE THIS MAPLE WORKSHEET with the COMMANDS
+    restart; read("\myFile\L-SERIES-2026.TXT");
+ 7.-OPTION 2 (TO TAKE MORE CONTROL):  
+    A WHITE MAPLE WORKSHEET, INSERTING MAPLE PROMPTS IF YOU WANT TO SPLIT PROOFS. 
+ 8.-SAVE AS A MAPLE .MW FILE AS \myFile\L-SERIES-2026.MW AND EXECUTE IT.
+    HAVE A NICE EXPLORATION !!
+*)
+
+#	
+interface(warnlevel=0):
+restart:
+gc():
+print(`########################################################################################
+
+    Searching and Proving Hypergeometric Series for Dirichlet L-SERIES and other Constants
+
+    Abstract:
+
+    The program searches and automatically proves hypergeometric series for constants
+    using the WZ algorithm to accelerate Dougall's 5H5 identity
+
+    Author: Jesus Guillera (Dr. Universidad de Zaragoza)
+
+    Modified by Jorge Zuniga to use Creative Telelescoping Algorithm by Hadrien Brochet & Bruno Salvy
+    including L-SERIES from \"Fast Computing Formulas for some Dirichlet L-Series\" 
+    arXiv:2601.12495 [Math.NT], 2026. 
+
+    Original version: 2014. This one with L-Series added, J. Zuniga, 2026. Written in Maple 2026 
+
+########################################################################################`);
+
+t0:=time():
+GREEN:=g->cat(`#mn(\"`,g,`",mathcolor=\"#227d3f\")`):
+interface(warnlevel=0):
+libname:= "..",libname:
+with(CreativeTelescoping):
+kernelopts(opaquemodules=false):
+alias(p=pochhammer):
+`print/pochhammer`:=(a,n)->``(a)[n]:
+with(SumTools[Hypergeometric]):
+
+with(numtheory):
+print();
+DL := (d, s) -> sum(jacobi(d, n)*Zeta(0, s, n/abs(d)), n = 1 .. abs(d))/abs(d)^s:
+regla := {DL(-24, 2) = L[-24](2), DL(-20, 2) = L[-20](2), DL(-15, 2) = L[-15](2), DL(-8, 2) = L[-8](2), DL(-7, 2) = L[-7](2), DL(-3, 2) = L[-3](2), DL(5, 3) = L[5](3), DL(8, 3) = L[8](3), DL(12, 3) = L[12](3)}:
+
+(*######################################################################*)
+
+po:=proc(i,j) local ff,cpo;
+#
+cpo:=proc(i,j) local f1,g1:                                                              
+g1:=i->i-floor(i):                                                                       
+f1:=(i,j)->factor(simplify(product(i+h,h=0..j-1)/product(g1(i)+h,h=0..j-1))):            
+return p(g1(i),j)*f1(i,j):
+end:
+#
+ff:=i->i-floor(i): if type(i,numeric) then                                               
+if i<0 and ff(i)<>0 then return cpo(i,j) else
+if i<=0 and ff(i)=0 then return p(1,j)/product(j-h,h=0..-i):
+else if i>0 and ff(i)=0 then return
+simplify(p(i,j)/p(ff(i)+1,j))*p(ff(i)+1,j)
+else: if ff(i) > 0 then return
+simplify(p(i,j)/p(ff(i),j))*p(ff(i),j)
+fi: fi: fi: fi: else return p(i,j): fi: 
+#
+end:
+
+(*######################################################################*)
+
+UU:=proc(r1,r2,r3,r4,r5) global U,po; local en,qq,ne,A1,A2,A;
+en:=[r1,r2,r3,r4,r5]:
+if r5=oo then ne:=1 else ne:=0 fi:
+A1:=(a,b,c,d,e,k)->(-1)^(ne*k)*product(po(en[i],k),i=2..nops(en)-ne):
+A2:=(a,b,c,d,e,k)->product(po(1+en[1]-en[i],k),i=2..nops(en)-ne):
+A:=(a,b,c,d,e,k)->A1(a,b,c,d,e,k)/A2(a,b,c,d,e,k)*(a+2*k):
+qq:=r1,r2,r3,r4,r5: U:=(n,k)->A(qq,k): end:
+
+(*######################################################################*)
+
+FF:=proc(r1,r2,r3,r4,r5)
+ 
+global z0,z1,F, ds; 
+local o,p1,p2,t1,t2,T,pz,S;
+UU(r1,r2,r3,r4,r5): 
+S:=Sum(U(n,k),k=0..n):
+
+try
+o:=subs(D[n]=N,CreativeTelescoping(S,[n::shift])[1]):
+catch "expression is not d-finite":
+o:=Zeilberger(U(n,k),n,k,N)[1]:
+end try:
+
+p1:=-solve(factor(coeff(o,N,1)),n): p2:=-solve(factor(coeff(o,N,0)),n):
+pz:=subs(n=1/n,-factor(coeff(o,N,1))/factor(coeff(o,N,0))):
+z0:=subs(n=0,(simplify(pz))):
+t1:=map(po,[p1],n): t2:=map(po,[p2],n):
+T:=(n,k)->product(t1[i],i=1..nops(t1))/product(t2[i],i=1..nops(t2)):
+F:=(n,k)->U(n,k)*T(n,k)*z0^n:
+S:=Sum(F(n,k),k=0..n):
+
+try
+ds := ` BS`: 
+z1[1]:=subs(D[n]=N,CreativeTelescoping(S,[n::shift],certificate='cert')[1]): 
+z1[2]:=-sum(coeff(cert[1],D[n],j)*F(n+j,k),j=0..degree(cert[1],D[n]))/coeff(z1[1],N,0):
+catch "expression is not d-finite":
+z1:=Zeilberger(F(n,k),n,k,N):
+ds := ` WZ`: 
+end try:
+
+if degree(z1[1],N) = 1 then 
+  if simplify(subs(n=n+1,coeff(z1[1],N,0)) + coeff(z1[1],N,1)) = 0 then 
+      print(); print(GREEN(cat(`OK, THERE EXISTS A`, ds,` PAIR`))); 
+  else 
+      print(); print(GREEN(cat(`USING A`, ds,` PAIR`))); 
+  end if:
+else
+  print(GREEN(`RECURRENCE DEGREE > 1`));
+  return 0;
+end if: 
+
+print(); print(GREEN(`COMPANION`));
+print(GREEN(`****************`));print(GREEN(`F(n,k)`)=convert(F(n,k),hypergeometric)): 
+print(); print(GREEN(`CERTIFY OF THE PROOF`)); 
+print(GREEN(`**************************`)); end:
+
+(*######################################################################*)
+
+CC:=proc(r1,r2,r3,r4,r5) 
+global sF,R,G,ss;
+local tt;
+tt:=FF(r1,r2,r3,r4,r5):
+if tt = 0 then return 0 end if;
+sF:=simplify(z1[2]/F(n,k)):
+R:=(nn,kk)->simplify(subs(n=nn,k=kk,sF)):
+G:=(n,k)->F(n,k)*R(n,k): print(GREEN(`C(n,k)`)=R(n,k)); end:
+
+(*######################################################################*)
+
+SER:=proc(r1,r2,r3,r4,r5) 
+global w,ss,res,HC,VAL;
+local tt;                            
+tt := CC(r1,r2,r3,r4,r5):
+if tt = 0 then return end if;
+print(); print(GREEN(`HYPERGEOMETRIC SERIES`));
+print(GREEN(`******************************`));  
+w:=factor(G(n,0)): Digits:=30:    
+ss:=evalf(Sum(w,n=0..infinity)):
+if type(ss,numeric) then 
+res:=identify(ss,extension=[Zeta(3),DL(-3,2),Catalan,DL(-7,2),DL(-8,2),DL(-15,2),DL(-20,2),DL(-24,2),DL(5,3),DL(8,3),DL(12,3)]): 
+else res:="there is no sum from n=0": fi; 
+print(Sum(w,n=0..infinity)=simplify(res,regla)); 
+print(GREEN(`_________________________________________________________________________________`)); print();
+return res:   
+end:
+
+print(GREEN("########################################################################################
+
+ REFERENCES
+
+ J. Guillera, Dougall's 5F4 sum and the WZ algorithm, Ramanujan J. 46, 667-675 2018
+ D. Zeilberger, Maple program A = B
+ W. Chu, q-series reciprocities & further Pi formulae, Kodai Math. J. 41, 512-530 2018
+ W. Chu & W. Zhang, Accelerating Dougall's 5F4 sum & oo series involving Pi, Math. Comp. 83, 475-512 2014
+ H. Brochet & B. Salvy, Reduction-based creative telescoping for definite summation of D-finite functions,
+ Journal of Symbolic Computation, Volume 125, Nov–Dec 2024, 102329
+ J. Zuniga, Fast Computing Formulas for some Dirichlet L-Series, arXiv:2601.12495 2026
+
+ NOTE: All references to Equations below are from this last Article.
+
+########################################################################################"));
+
+print(); print(GREEN(`TRY IT, ENJOY`));
+
+#`L__-3`(3) APERY'S CONSTANT ζ(3) #
+
+# Eq.(33). J. Zuniga 2023 #
+#
+print(); print(DL(1,3)); print();
+printf(`Eq.(33). J. Zuniga 2023\n`);
+printf(`SER(2+11*n,1+4*n,1+3*n,1+2*n,1+1*n)`);
+#
+SER(2+11*n,1+4*n,1+3*n,1+2*n,1+1*n):
+#
+
+# Eq.(37). J. Zuniga 2023 #
+#
+print(); print(DL(1,3)); print();
+printf(`Eq.(37). J. Zuniga 2023\n`);
+printf(`SER(2+10*n,1+4*n,1+3*n,1+2*n,1+n)`);
+# 
+SER(2+10*n,1+4*n,1+3*n,1+2*n,1+n):
+#
+#`L__-3`(2)#;
+#
+# Eq.(26). x=1/3, y=2/3, J. Guillera 2023 #
+#
+print(); print(L[-3](2)); print();
+printf(`Eq.(26). x=1/3, y=2/3, J. Guillera (2023)\n`);
+printf(`SER(1+3*n,1/3+n,1/3+n,2/3+n,2/3+n)`);
+#
+SER(1+3*n,1/3+n,1/3+n,2/3+n,2/3+n):
+# 
+#`L__-4`(2), CATALAN'S CONSTANT G #
+#
+# Eq.(41). Gosper 197x - Pilehrood 2010 #
+#
+print(); print(L[-4](2)); print();
+printf(`Eq.(41). Gosper 197x - Pilehrood 2010\n`);
+printf(`SER(1+4*n,1/2+2*n,1/2+1*n,1/2+1*n,oo)`);
+SER(1+4*n,1/2+2*n,1/2+1*n,1/2+1*n,oo):
+#
+# Eq.(42). Gosper 197x - Pilehrood 2010, Bisected Eq.(26). x=1/4, y=3/4 #
+#
+print(); print(L[-4](2)); print();
+printf(`Eq.(42). Gosper 197x - Pilehrood 2010, Bisected Eq.(26). x=1/4, y=3/4\n`);
+printf(`SER(1+4*n,1/4+n,1/4+n,3/4+n,3/4+n)`);
+SER(1+4*n,1/4+n,1/4+n,3/4+n,3/4+n):
+#
+# Eq.(43). J. Zuniga 2023 #
+#
+print(); print(L[-4](2)); print();
+printf(`Eq.(43). J. Zuniga 2023\n`);
+printf(`SER(1+8*n,1/2+4*n,1/2+3*n,1/2+2*n,oo)`);
+SER(1+8*n,1/2+4*n,1/2+3*n,1/2+2*n,oo):
+#
+# `L__-7`(2) #
+#
+# Eqs.(47-48): 49*L(-7,2)= ζ(2,1/7)- ζ(2,6/7)+ ζ(2,2/7)- ζ(2,5/7)- ζ(2,3/7)+ ζ(2,4/7) #
+#
+print(); print(L[-7](2)); print();
+#
+printf(`Eqs.(47-48)`); print();
+printf(`S1 = SER(1+5*n,1/7+2*n,1/7+2*n,6/7+2*n,6/7+2*n)`);
+S1:=SER(1+5*n,1/7+2*n,1/7+2*n,6/7+2*n,6/7+2*n):
+print(S[1]=S1); print();
+#
+printf(`S2 = SER(1+5*n,2/7+2*n,2/7+2*n,5/7+2*n,5/7+2*n)`); 
+S2:=SER(1+5*n,2/7+2*n,2/7+2*n,5/7+2*n,5/7+2*n):
+print(S[2]=S2); print();
+#
+printf(`S3 = SER(1+5*n,3/7+2*n,3/7+2*n,4/7+2*n,4/7+2*n)`);
+S3:=SER(1+5*n,3/7+2*n,3/7+2*n,4/7+2*n,4/7+2*n):
+print(S[3]=S3); print();
+#
+print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-7](2)-(35/36*S[1]+21/100*S[2]-7/144*S[3])=
+DL(-7,2) - identify(evalf[30](S1*35/36 + S2*21/100 - S3*7/144),extension=[DL(-7,2)]));
+print();
+#
+# `L__-8`(2) #
+#
+# Eqs.(52, 54, 57): 32*L(-8,2) = ζ(2,3/8)-ζ(2,7/8)+2*Pi^2*sqrt(2) #
+#
+print(); print(L[-8](2)); print();
+#
+printf(`Eqs.(52,54,57)\n`);
+printf(`S1 = SER(5/4+4*n,3/8+n,3/8+n,7/8+n,7/8+n)`);
+S1:=SER(5/4+4*n,3/8+n,3/8+n,7/8+n,7/8+n):
+print(S[1]=S1); print();
+print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-8](2)-(64/441*S[1]+1/16*Pi^2*sqrt(2))=
+DL(-8,2)-identify(evalf[30](64/441*S1+1/16*Pi^2*sqrt(2)),extension=[DL(-8,2)]));
+print();
+#
+# Eqs.(53, 55, 58): 32*L(-8,2) = ζ(2,1/8)-ζ(2,5/8)-2*Pi^2*sqrt(2) #
+#
+print(); print(L[-8](2)); print();
+printf(`Eqs.(53,55,58)\n`);
+printf(`S2 = SER(3/4+4*n,1/8+n,1/8+n,5/8+n,5/8+n)`);
+S2:=SER(3/4+4*n,1/8+n,1/8+n,5/8+n,5/8+n):
+print(S[2]=S2); print();
+print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-8](2)-(64/25*S[2]-1/16*Pi^2*sqrt(2))=
+DL(-8,2)-identify(evalf[30](64/25*S2-1/16*Pi^2*sqrt(2)),extension=[DL(-8,2)]));
+print();
+#
+# `L__-15`(2) #
+#
+# Eqs.(63, 64), Appendix #
+#
+print(); print(L[-15](2)); print();
+printf(`Eq.(63)\n`);
+printf(`S1 = SER(4/5+3*n,1/15+n,1/15+n,11/15+n,11/15+n)`);
+S1:=SER(4/5+3*n,1/15+n,1/15+n,11/15+n,11/15+n):
+print(S[1]=S1); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-15](2)-(600/121*S[1]-26/25*L[-3](2)-8/225*Pi^2*sqrt(15+6*sqrt(5)))=
+DL(-15,2)-identify(evalf[30](600/121*S1-26/25*DL(-3,2)-8/225*Pi^2*sqrt(15+6*sqrt(5))),extension=[DL(-3,2),DL(-15,2)]));
+print();
+#
+
+print(); print(L[-15](2)); print();
+printf(`Eq.(64)\n`);
+printf(`S2 = SER(3/5+3*n,2/15+n,2/15+n,7/15+n,7/15+n)`);
+S2:=SER(3/5+3*n,2/15+n,2/15+n,7/15+n,7/15+n):
+print(S[2]=S2); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-15](2)-(75/49*S[2]+26/25*L[-3](2)-8/225*Pi^2*sqrt(15-6*sqrt(5)))=
+DL(-15,2)-identify(evalf[30](75/49*S2+26/25*DL(-3,2)-8/225*Pi^2*sqrt(15-6*sqrt(5))),extension=[DL(-3,2),DL(-15,2)]));
+print();
+#
+
+print(); print(L[-15](2)); print();
+printf(`Appendix\n`);
+printf(`S3 = SER(6/5+3*n,4/15+n,4/15+n,14/15+n,14/15+n)`);
+S3:=SER(6/5+3*n,4/15+n,4/15+n,14/15+n,14/15+n):
+print(S[3]=S3); print(); ;print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-15](2)-(75/392*S[3]-26/25*L[-3](2)+8/225*Pi^2*sqrt(15+6*sqrt(5)))=
+DL(-15,2)-identify(evalf[30](75/392*S3-26/25*DL(-3,2)+8/225*Pi^2*sqrt(15+6*sqrt(5))),extension=[DL(-3,2),DL(-15,2)]));
+print();
+#
+
+print(); print(L[-15](2)); print();
+printf(`Appendix\n`);
+printf(`S4 = SER(7/5+3*n,8/15+n,8/15+n,13/15+n,13/15+n)`);
+S4:=SER(7/5+3*n,8/15+n,8/15+n,13/15+n,13/15+n):
+print(S[4]=S4); print(); ;print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-15](2)-(75/2704*S[4]+26/25*L[-3](2)+8/225*Pi^2*sqrt(15-6*sqrt(5)))=
+DL(-15,2)-identify(evalf[30](75/2704*S4+26/25*DL(-3,2)+8/225*Pi^2*sqrt(15-6*sqrt(5))),extension=[DL(-3,2),DL(-15,2)]));
+print();
+#
+
+# `L__-20`(2) #
+# Eqs.(65, 66), Appendix #
+#
+print(); print(L[-20](2)); print();
+printf(`Eq.(65)\n`);
+printf(`S1 = SER(3/5+3*n,1/20+n,1/20+n,11/20+n,11/20+n)`);
+S1:=SER(3/5+3*n,1/20+n,1/20+n,11/20+n,11/20+n):
+print(S[1]=S1); print(); ;print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-20](2)-(800/121*S[1]-24/25*Catalan-1/50*Pi^2*sqrt(50+22*sqrt(5)))=
+DL(-20,2)-identify(evalf[30](800/121*S1-24/25*Catalan-1/50*Pi^2*sqrt(50+22*sqrt(5))),extension=[Catalan,DL(-20,2)]));
+print();
+#
+
+print(); print(L[-20](2)); print();
+printf(`Eq.(66)\n`);
+printf(`S2 = SER(4/5+3*n,3/20+n,3/20+n,13/20+n,13/20+n)`);
+S2:=SER(4/5+3*n,3/20+n,3/20+n,13/20+n,13/20+n):
+print(S[2]=S2); print(); ;print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-20](2)-(800/1521*S[2]+24/25*Catalan-1/50*Pi^2*sqrt(50-22*sqrt(5)))=
+DL(-20,2)-identify(evalf[30](800/1521*S2+24/25*Catalan-1/50*Pi^2*sqrt(50-22*sqrt(5))),extension=[Catalan,DL(-20,2)]));
+print();
+#
+
+print(); print(L[-20](2)); print();
+printf(`Appendix\n`);
+printf(`S3 = SER(7/5+3*n,9/20+n,9/20+n,19/20+n,19/20+n)`);
+S3:=SER(7/5+3*n,9/20+n,9/20+n,19/20+n,19/20+n):
+print(S[3]=S3); print(); ;print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-20](2)-(800/29241*S[3]-24/25*Catalan+1/50*Pi^2*sqrt(50+22*sqrt(5)))=
+DL(-20,2)-identify(evalf[30](800/29241*S3-24/25*Catalan+1/50*Pi^2*sqrt(50+22*sqrt(5))),extension=[Catalan,DL(-20,2)]));
+print();
+#
+
+print(); print(L[-20](2)); print();
+printf(`Appendix\n`);
+printf(`S4 = SER(6/5+3*n,7/20+n,7/20+n,17/20+n,17/20+n)`);
+S4:=SER(6/5+3*n,7/20+n,7/20+n,17/20+n,17/20+n):
+print(S[4]=S4); print(); ;print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-20](2)-(800/14161*S[4]+24/25*Catalan+1/50*Pi^2*sqrt(50-22*sqrt(5)))=
+DL(-20,2)-identify(evalf[30](800/14161*S4+24/25*Catalan+1/50*Pi^2*sqrt(50-22*sqrt(5))),extension=[Catalan,DL(-20,2)]));
+print();
+#
+
+# `L__-24`(2) #
+#
+# Eqs.(67, 68), (69, 70), Appendix #
+#
+print(); print(L[-24](2)); print();
+printf(`Eq.(67)\n`);
+printf(`S1 = SER(3/4+3*n,1/24+n,1/24+n,17/24+n,17/24+n)`);
+S1 := SER(3/4+3*n,1/24+n,1/24+n,17/24+n,17/24+n):
+print(S[1]=S1); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(1536/289*S[1]-5/4*L[-3](2)-1/72*Pi^2*(4*sqrt(3)+3*sqrt(6)))=
+DL(-24,2)-identify(evalf[30](1536/289*S1-5/4*DL(-3,2)-1/72*Pi^2*(4*sqrt(3)+3*sqrt(6))),extension=[DL(-3,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Eq.(68)\n`);
+printf(`S2 = SER(3/4+3*n,5/24+n,5/24+n,13/24+n,13/24+n)`);
+S2 := SER(3/4+3*n,5/24+n,5/24+n,13/24+n,13/24+n):
+print(S[2]=S2); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(768/4225*S[2]+5/4*L[-3](2)+1/72*Pi^2*(4*sqrt(3)-3*sqrt(6)))=
+DL(-24,2)-identify(evalf[30](768/4225*S2+5/4*DL(-3,2)+1/72*Pi^2*(4*sqrt(3)-3*sqrt(6))),extension=[DL(-3,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Appendix\n`);
+printf(`S3 = SER(5/4+3*n,7/24+n,7/24+n,23/24+n,23/24+n)`);
+S3 := SER(5/4+3*n,7/24+n,7/24+n,23/24+n,23/24+n):
+print(S[3]=S3); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(1536/25921*S[3]-5/4*L[-3](2)+1/72*Pi^2*(4*sqrt(3)+3*sqrt(6)))=
+DL(-24,2)-identify(evalf[30](1536/25921*S3-5/4*DL(-3,2)+1/72*Pi^2*(4*sqrt(3)+3*sqrt(6))),extension=[DL(-3,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Appendix\n`);
+printf(`S4 = SER(5/4+3*n,11/24+n,11/24+n,19/24+n,19/24+n)`);
+S4 := SER(5/4+3*n,11/24+n,11/24+n,19/24+n,19/24+n):
+print(S[4]=S4); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(768/43681*S[4]+5/4*L[-3](2)-1/72*Pi^2*(4*sqrt(3)-3*sqrt(6)))=
+DL(-24,2)-identify(evalf[30](768/43681*S4+5/4*DL(-3,2)-1/72*Pi^2*(4*sqrt(3)-3*sqrt(6))),extension=[DL(-3,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Eq.(69)\n`);
+printf(`S5 = SER(7/6+3*n,5/24+n,5/24+n,23/24+n,23/24+n)`);
+S5 := SER(7/6+3*n,5/24+n,5/24+n,23/24+n,23/24+n):
+print(S[5]=S5); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(1728/13225*S[5]-10/9*Catalan+1/72*Pi^2*(5*sqrt(2)+4*sqrt(3)))=
+DL(-24,2)-identify(evalf[30](1728/13225*S5-10/9*Catalan+1/72*Pi^2*(5*sqrt(2)+4*sqrt(3))),extension=[DL(-4,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Eq.(70)\n`);
+printf(`S6 = SER(7/6+3*n,11/24+n,11/24+n,17/24+n,17/24+n)`);
+S6 := SER(7/6+3*n,11/24+n,11/24+n,17/24+n,17/24+n):
+print(S[6]=S6); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(576/34969*S[6]+10/9*Catalan+1/72*Pi^2*(5*sqrt(2)-4*sqrt(3)))=
+DL(-24,2)-identify(evalf[30](576/34969*S6+10/9*Catalan+1/72*Pi^2*(5*sqrt(2)-4*sqrt(3))),extension=[DL(-4,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Appendix\n`);
+printf(`S7 = SER(5/6+3*n,1/24+n,1/24+n,19/24+n,19/24+n)`);
+S7 := SER(5/6+3*n,1/24+n,1/24+n,19/24+n,19/24+n):
+print(S[7]=S7); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(1728/361*S[7]-10/9*Catalan-1/72*Pi^2*(5*sqrt(2)+4*sqrt(3)))=
+DL(-24,2)-identify(evalf[30](1728/361*S7-10/9*Catalan-1/72*Pi^2*(5*sqrt(2)+4*sqrt(3))),extension=[DL(-4,2),DL(-24,2)]));
+print();
+#
+
+print(); print(L[-24](2)); print();
+printf(`Appendix\n`);
+printf(`S8 = SER(5/6+3*n,7/24+n,7/24+n,13/24+n,13/24+n)`);
+S8 := SER(5/6+3*n,7/24+n,7/24+n,13/24+n,13/24+n):
+print(S[8]=S8); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[-24](2)-(576/8281*S[8]+10/9*Catalan-1/72*Pi^2*(5*sqrt(2)-4*sqrt(3)))=
+DL(-24,2)-identify(evalf[30](576/8281*S8+10/9*Catalan-1/72*Pi^2*(5*sqrt(2)-4*sqrt(3))),extension=[DL(-4,2),DL(-24,2)]));
+print();
+#
+
+# `L__5`(3) #
+#
+# Eqs.(71,72), Appendix #
+#
+print(); print(L[5](3)); print();
+printf(`Eq.(71)\n`);
+printf(`S1 = SER(2/5+6*n,1/5+3*n,1/5+2*n,1/5+2*n,1/5+2*n)`);
+S1:=SER(2/5+6*n,1/5+3*n,1/5+2*n,1/5+2*n,1/5+2*n):
+print(S[1]=S1); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[5](3)-(10*S[1]-124/125*Zeta(3)-4/625*Pi^3*(sqrt(25+2*sqrt(5))+sqrt(25-2*sqrt(5))))=
+DL(5,3)-identify(evalf[30](10*S1-124/125*Zeta(3)-4/625*Pi^3*(sqrt(25+2*sqrt(5))+sqrt(25-2*sqrt(5)))),extension=[DL(5,3)]));
+print();
+#
+
+print(); print(L[5](3)); print();
+printf(`Eq.(72)\n`);
+printf(`S2 = SER(4/5+6*n,2/5+3*n,2/5+2*n,2/5+2*n,2/5+2*n)`);
+S2:=SER(4/5+6*n,2/5+3*n,2/5+2*n,2/5+2*n,2/5+2*n):
+print(S[2]=S2); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[5](3)-(-5/8*S[2]+124/125*Zeta(3)+4/625*Pi^3*(sqrt(25+2*sqrt(5))-sqrt(25-2*sqrt(5))))=
+DL(5,3)-identify(evalf[30](-5/8*S2+124/125*Zeta(3)+4/625*Pi^3*(sqrt(25+2*sqrt(5))-sqrt(25-2*sqrt(5)))),extension=[DL(5,3)]));
+print();
+#
+
+print(); print(L[5](3)); print();
+printf(`Appendix\n`);
+printf(`S3 = SER(6/5+6*n,3/5+3*n,3/5+2*n,3/5+2*n,3/5+2*n)`);
+S3:=SER(6/5+6*n,3/5+3*n,3/5+2*n,3/5+2*n,3/5+2*n):
+print(S[3]=S3); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[5](3)-(-10/81*S[3]+124/125*Zeta(3)-4/625*Pi^3*(sqrt(25+2*sqrt(5))-sqrt(25-2*sqrt(5))))=
+DL(5,3)-identify(evalf[30](-10/81*S3+124/125*Zeta(3)-4/625*Pi^3*(sqrt(25+2*sqrt(5))-sqrt(25-2*sqrt(5)))),extension=[DL(5,3)])); print();
+#
+
+print(); print(L[5](3)); print();
+printf(`Appendix\n`);
+printf(`S4 = SER(8/5+6*n,4/5+3*n,4/5+2*n,4/5+2*n,4/5+2*n)`);
+S4:=SER(8/5+6*n,4/5+3*n,4/5+2*n,4/5+2*n,4/5+2*n):
+print(S[4]=S4); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[5](3)-(5/128*S[4]-124/125*Zeta(3)+4/625*Pi^3*(sqrt(25+2*sqrt(5))+sqrt(25-2*sqrt(5))))=
+DL(5,3)-identify(evalf[30](5/128*S4-124/125*Zeta(3)+4/625*Pi^3*(sqrt(25+2*sqrt(5))+sqrt(25-2*sqrt(5)))),extension=[DL(5,3)])); print();
+#
+
+# `L__8`(3) #
+#
+# Eqs.(76,77), Appendix #
+#
+print(); print(L[8](3)); print();
+printf(`Eq.(76)\n`);
+printf(`S1 = SER(1/4+4*n,1/8+2*n,1/8+n,1/8+n,1/8+n)`);
+S1:=SER(1/4+4*n,1/8+2*n,1/8+n,1/8+n,1/8+n):
+print(S[1]=S1); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[8](3)-(16*S[1]-7/8*Zeta(3)-1/128*Pi^3*(4+3*sqrt(2)))=
+DL(8,3)-identify(evalf[30](16*S1-7/8*Zeta(3)-1/128*Pi^3*(4+3*sqrt(2))),extension=[DL(8,3)])); print();
+#
+
+print(); print(L[8](3)); print();
+printf(`Eq.(77)\n`);
+printf(`S2 = SER(3/4+4*n,3/8+2*n,3/8+n,3/8+n,3/8+n)`);
+S2:=SER(3/4+4*n,3/8+2*n,3/8+n,3/8+n,3/8+n):
+print(S[2]=S2); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[8](3)-(-16/81*S[2]+7/8*Zeta(3)-1/128*Pi^3*(4-3*sqrt(2)))=
+DL(8,3)-identify(evalf[30](-16/81*S2+7/8*Zeta(3)-1/128*Pi^3*(4-3*sqrt(2))),extension=[DL(8,3)])); print();
+#
+
+print(); print(L[8](3)); print();
+printf(`Appendix\n`);
+printf(`S3 = SER(5/4+4*n,5/8+2*n,5/8+n,5/8+n,5/8+n)`);
+S3:=SER(5/4+4*n,5/8+2*n,5/8+n,5/8+n,5/8+n):
+print(S[3]=S3); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[8](3)-(-16/625*S[3]+7/8*Zeta(3)+1/128*Pi^3*(4-3*sqrt(2)))=
+DL(8,3)-identify(evalf[30](-16/625*S3+7/8*Zeta(3)+1/128*Pi^3*(4-3*sqrt(2))),extension=[DL(8,3)])); print();
+#
+
+print(); print(L[8](3)); print();
+printf(`Appendix\n`);
+printf(`S4 = SER(7/4+4*n,7/8+2*n,7/8+n,7/8+n,7/8+n)`);
+S4:=SER(7/4+4*n,7/8+2*n,7/8+n,7/8+n,7/8+n):
+print(S[4]=S4); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[8](3)-(16/2401*S[4]-7/8*Zeta(3)+1/128*Pi^3*(4+3*sqrt(2)))=
+DL(8,3)-identify(evalf[30](16/2401*S4-7/8*Zeta(3)+1/128*Pi^3*(4+3*sqrt(2))),extension=[DL(8,3)])); print();
+#
+
+# `L__12`(3) # 
+#
+# Eqs.(78,79), Appendix #
+#
+print(); print(L[12](3)); print();
+printf(`Eq.(78)\n`);
+printf(`S1 = SER(1/6+4*n,1/12+2*n,1/12+n,1/12+n,1/12+n)`);
+S1:=SER(1/6+4*n,1/12+2*n,1/12+n,1/12+n,1/12+n):
+print(S[1]=S1); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[12](3)-(24*S[1]-91/108*Zeta(3)-1/216*Pi^3*(7+4*sqrt(3)))=
+DL(12,3)-identify(evalf[30](24*S1-91/108*Zeta(3)-1/216*Pi^3*(7+4*sqrt(3))),extension=[DL(12,3)])); print();
+#
+ 
+print(); print(L[12](3)); print();
+printf(`Eq.(79)\n`);
+printf(`S2 = SER(5/6+4*n,5/12+2*n,5/12+n,5/12+n,5/12+n)`);
+S2:=SER(5/6+4*n,5/12+2*n,5/12+n,5/12+n,5/12+n):
+print(S[2]=S2); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[12](3)-(-24/625*S[2]+91/108*Zeta(3)+1/216*Pi^3*(7-4*sqrt(3)))=
+DL(12,3)-identify(evalf[30](-24/625*S2+91/108*Zeta(3)+1/216*Pi^3*(7-4*sqrt(3))),extension=[DL(12,3)])); print();
+#
+
+print(); print(L[12](3)); print();
+printf(`Appendix\n`);
+printf(`S3 = SER(7/6+4*n,7/12+2*n,7/12+n,7/12+n,7/12+n)`);
+S3:=SER(7/6+4*n,7/12+2*n,7/12+n,7/12+n,7/12+n):
+print(S[3]=S3); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[12](3)-(-24/2401*S[3]+91/108*Zeta(3)-1/216*Pi^3*(7-4*sqrt(3)))=
+DL(12,3)-identify(evalf[30](-24/2401*S3+91/108*Zeta(3)-1/216*Pi^3*(7-4*sqrt(3))),extension=[DL(12,3)])); print();
+#
+
+print(); print(L[12](3)); print();
+printf(`Appendix\n`);
+printf(`S4 = SER(11/6+4*n,11/12+2*n,11/12+n,11/12+n,11/12+n)`);
+S4:=SER(11/6+4*n,11/12+2*n,11/12+n,11/12+n,11/12+n):
+print(S[4]=S4); print(); print(GREEN(`PROVEN IDENTITY`));
+print(GREEN(`********************`));
+print(L[12](3)-(24/14641*S[4]-91/108*Zeta(3)+1/216*Pi^3*(7+4*sqrt(3)))=
+DL(12,3)-identify(evalf[30](24/14641*S4-91/108*Zeta(3)+1/216*Pi^3*(7+4*sqrt(3))),extension=[DL(12,3)])); print();
+#
+print(Total_Time_(min)=(time()-t0)/60);
