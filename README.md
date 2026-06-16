@@ -3,8 +3,8 @@
 				   
     MAPLE 2026 FILES "L-SERIES-2026.TXT" AND/OR "L-SERIES-2026.MW".
 	
-    DIRECTIONS FOR BUILDING, LOADING & EXECUTING TO GET WZ PROOFS OF IDENTITIES 
-	AS INDICATED IN ARTICLE "Fast Computing Formulas for some Dirichlet L-Series"
+    DIRECTIONS FOR BUILDING, LOADING & EXECUTING TO GET Wilf-Zeilberger PROOFS OF 
+	L-SERIES IDENTITIES FROM ARTICLE "Fast Computing Formulas for some Dirichlet L-Series"
 	ArXiv:2601.12495 [math.NT], Jorge Zuniga 2026:
 	
  1.- DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
