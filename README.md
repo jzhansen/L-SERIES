@@ -17,9 +17,10 @@
 	
  3.- Add both .mla files to the directory maple20XX/lib/
  
-    You can either stop here and get all files from this GitHub repository or 
+    You can either stop here and get all required files from this GitHub repository or 
 	continue to get the necessary Maple script files from a large comment in the TeX 
-	file downloaded from ArXiv:2601.12495 repository. Follow these directions:	
+	file downloaded from [ArXiv:2601.12495](https://arxiv.org/src/2601.12495) repository. 
+	Follow these directions:	
  
  4.- CUT LAST COMMENT SECTION (FROM ArXiv TeX FILE) AND PASTE IT INTO ANY OF THESE TWO OPTIONS:
 	
