@@ -1,5 +1,5 @@
                         
-				 JORGE ZUNIGA. (2026) L-SERIES Z PROOFS
+				 JORGE ZUNIGA. (2026) L-SERIES WZ PROOFS
 				   
     MAPLE FILES "L-SERIES-2026.TXT" AND/OR "L-SERIES-2026.MW".
 	
@@ -8,9 +8,11 @@
 	ArXiv:2601.12495 [math.NT], Jorge Zuniga 2026:
 	
  1.-DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
+ 
     https://github.com/HBrochet/CreativeTelescoping/blob/main/CreativeTelescoping.mla
 	
  2.-DOWNLOAD MAPLE FILE "Mgfun4.1.mla" from this link
+ 
     https://specfun.inria.fr/chyzak/Mgfun4.1.mla
 	
  3.-Add both .mla files to the directory maple20XX/lib/
