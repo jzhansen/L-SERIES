@@ -7,11 +7,11 @@
 	L-SERIES IDENTITIES FROM ARTICLE "Fast Computing Formulas for some Dirichlet L-Series"
 	ArXiv:2601.12495 [math.NT], Jorge Zuniga 2026:
 	
- ###1.- DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
+ ### 1.- DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
  
     https://github.com/HBrochet/CreativeTelescoping/blob/main/CreativeTelescoping.mla
 	
-###2.- DOWNLOAD MAPLE FILE "Mgfun4.1.mla" from this link
+### 2.- DOWNLOAD MAPLE FILE "Mgfun4.1.mla" from this link
  
     https://specfun.inria.fr/chyzak/Mgfun4.1.mla
 	
