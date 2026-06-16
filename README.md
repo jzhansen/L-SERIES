@@ -1,5 +1,5 @@
                         
-###				 **JORGE ZUNIGA. (2026) L-SERIES WZ PROOFS**
+###				 **JORGE ZUNIGA. L-SERIES WZ PROOFS (2026)**
 				   
 ####    MAPLE 2026 FILES "L-SERIES-2026.TXT" AND/OR "L-SERIES-2026.MW".
 	
@@ -7,7 +7,7 @@
 	L-SERIES IDENTITIES FROM ARTICLE "Fast Computing Formulas for some Dirichlet L-Series"
 	ArXiv:2601.12495 [math.NT], Jorge Zuniga 2026:
 	
-1.- DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
+##### 1.- DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
  
     https://github.com/HBrochet/CreativeTelescoping/blob/main/CreativeTelescoping.mla
 	
