@@ -9,8 +9,10 @@
 	
  1.-DOWNLOAD MAPLE FILE "CreativeTelescoping.mla" from this link
     https://github.com/HBrochet/CreativeTelescoping/blob/main/CreativeTelescoping.mla
+	
  2.-DOWNLOAD MAPLE FILE "Mgfun4.1.mla" from this link
     https://specfun.inria.fr/chyzak/Mgfun4.1.mla
+	
  3.-Add both .mla files to the directory maple20XX/lib/
  
     You can either stop here and get all files from this GitHub repository or 
@@ -19,11 +21,19 @@
  
  4.-CUT LAST COMMENT SECTION (FROM ArXiv TeX FILE) AND PASTE IT INTO ANY OF THESE
     TWO OPTIONS:
- 5.-OPTION 1: 
-    A TEXT FILE "L-SERIES-2026.TXT" AND SAVE IT IN WORKING DIRECTORY, SAY \MyFile 
+	
+ 5.-OPTION 1:
+ 
+    A TEXT FILE "L-SERIES-2026.TXT" AND SAVE IT IN WORKING DIRECTORY, SAY \MyFile
+	
  6.-EXECUTE THIS MAPLE WORKSHEET with the COMMANDS
+ 
     restart; read("\myFile\L-SERIES-2026.TXT");
- 7.-OPTION 2 (TO TAKE MORE CONTROL):  
-    A WHITE MAPLE WORKSHEET, INSERTING MAPLE PROMPTS IF YOU WANT TO SPLIT PROOFS. 
+	
+ 7.-OPTION 2 (TO TAKE MORE CONTROL):
+ 
+    A WHITE MAPLE WORKSHEET, INSERTING MAPLE PROMPTS IF YOU WANT TO SPLIT PROOFS.
+	
  8.-SAVE AS A MAPLE .MW FILE AS \myFile\L-SERIES-2026.MW AND EXECUTE IT.
+ 
     HAVE A NICE EXPLORATION !!
