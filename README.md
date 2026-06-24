@@ -32,7 +32,7 @@
  
     restart; read("\myFile\L-SERIES-2026.TXT");
 	
- ##### 7.- OPTION 2 (TO TAKE MORE CONTROL):
+ ##### 7.- OPTION 2 (Taking more control):
  
     A WHITE MAPLE WORKSHEET, INSERTING MAPLE PROMPTS IF YOU WANT TO SPLIT PROOFS.
 	
